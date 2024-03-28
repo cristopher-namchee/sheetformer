@@ -135,13 +135,32 @@ function formatAsDate(
   segment: string | null = null,
   expected_length: number | null = null
 ): string | null {
-  const dateParts = ocrText.split("-");
+  const dateSplit = ocrText.split("-");
+  let dateParts = [];
 
   if (!isNaN(Date.parse(ocrText))) {
     const date = new Date(ocrText);
-    dateParts[0] = date.getDate().toString();
-    dateParts[1] = (date.getMonth() + 1).toString();
-    dateParts[2] = date.getFullYear().toString();
+    dateParts[0] =
+      (dateSplit.length === 3 && dateSplit[2].length === 2) ||
+      (dateSplit.length === 2 &&
+        dateSplit[0].length == 2 &&
+        dateSplit[1].length === 2)
+        ? date.getDate().toString()
+        : null;
+    dateParts[1] =
+      (dateSplit.length === 3 && dateSplit[1].length === 2) ||
+      (dateSplit.length === 2 &&
+        dateSplit[0].length == 4 &&
+        dateSplit[1].length == 2) ||
+      (dateSplit.length === 2 && dateSplit[0].length == 2)
+        ? (date.getMonth() + 1).toString()
+        : null;
+    dateParts[2] =
+      dateSplit.length >= 1 && dateSplit[0].length === 4
+        ? date.getFullYear().toString()
+        : null;
+  } else {
+    dateParts = dateSplit;
   }
 
   for (let idx = 0; idx < dateParts.length; idx++) {
